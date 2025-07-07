@@ -86,6 +86,8 @@ class Asta(models.Model):
     # e un'asta può essere nei preferiti di molti utenti.
     # `blank=True` significa che questo campo non è obbligatorio.
     utenti_lista_desideri = models.ManyToManyField(User, related_name='lista_desideri', blank=True)
+    class Meta:
+        verbose_name_plural = "Aste"
 
     def __str__(self):
         return f"Asta: {self.titolo} | Venditore: {self.venditore.username}"
@@ -103,6 +105,7 @@ class Offerta(models.Model):
         # prevenendo offerte duplicate dello stesso valore sulla stessa asta.
         unique_together = ('asta', 'importo')
         ordering = ['-importo'] # Ordina le offerte dalla più alta alla più bassa di default.
+        verbose_name_plural = "Offerte"
 
     def __str__(self):
         return f"Offerta di {self.importo} su '{self.asta.titolo}' da {self.acquirente.username}"
