@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Registrazione{% endblock %}
+
+{% block content %}
+<h2>Crea il tuo account</h2>
+<p>Compila il form per registrarti alla piattaforma.</p>
+<form method="post">
+    {% csrf_token %}
+    <!-- Spiegazione: `form.as_p` renderizzerà ogni campo del nostro CustomUserCreationForm
+         all'interno di un tag <p>, inclusi i nostri campi personalizzati. -->
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Registrati</button>
+</form>
+{% endblock %}

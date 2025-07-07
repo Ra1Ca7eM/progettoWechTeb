@@ -126,3 +126,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Cartella separata per i file caricati dagli utenti
+# aste_project/settings.py
+LOGIN_REDIRECT_URL = '/'  # Dopo il login, vai alla homepage
+LOGOUT_REDIRECT_URL = '/' # Dopo il logout, vai alla homepage
+LOGIN_URL = 'login'       # Se un utente non è loggato, reindirizzalo all'URL con nome 'login'

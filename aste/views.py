@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.views.generic import *
 from .models import * 
+from django.urls import reverse_lazy
+from .forms import * # Importa il nostro nuovo form
 
 class HomeAsteView(ListView):
     # Spiegazione: Stiamo creando una vista basata sulla generica ListView.
@@ -53,3 +55,18 @@ class DettaglioAstaView(DetailView):
         context['offerta_piu_alta'] = offerta_piu_alta
         
         return context
+    
+class RegistrazioneView(CreateView):
+    # Spiegazione: Usiamo una CreateView generica, ma la personalizziamo
+    # per usare il nostro form invece di farne generare uno a Django.
+    
+    # 1. Invece di 'model', specifichiamo 'form_class'.
+    #    Questo dice alla CreateView di usare il nostro CustomUserCreationForm.
+    form_class = CustomUserCreationForm
+    
+    # 2. Specifichiamo il template che mostrerà il form.
+    template_name = 'registration/registrazione.html'
+    
+    # 3. Specifichiamo l'URL a cui reindirizzare l'utente dopo una registrazione
+    #    riuscita. `reverse_lazy` cerca un URL con il nome 'login'.
+    success_url = reverse_lazy('login')
