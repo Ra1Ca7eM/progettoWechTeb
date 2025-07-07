@@ -1,0 +1,28 @@
+
+{% extends "base.html" %}
+
+{% block title %}Homepage Aste{% endblock %}
+
+{% block content %}
+<h1>Aste attualmente attive</h1>
+<div class="row">
+    <!-- Spiegazione: ListView ci fornisce la lista di aste nella variabile 'aste_list' -->
+    {% for asta in aste_list %}
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="{{ asta.immagine.url }}" class="card-img-top" alt="{{ asta.titolo }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ asta.titolo }}</h5>
+                    <p class="card-text">{{ asta.descrizione|truncatewords:20 }}</p>
+                    <!-- Spiegazione: Usiamo il tag `url` per creare un link dinamico.
+                         'aste:dettaglio_asta' è il nome che daremo al nostro URL tra poco.
+                         `asta.pk` è la primary key (l'ID) dell'oggetto asta corrente. -->
+                    <a href="{% url 'aste:dettaglio_asta' asta.pk %}" class="btn btn-primary">Vedi Dettagli</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="col">Al momento non ci sono aste attive.</p>
+    {% endfor %}
+</div>
+{% endblock %}

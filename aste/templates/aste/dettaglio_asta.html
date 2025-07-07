@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{{ asta.titolo }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <img src="{{ asta.immagine.url }}" class="img-fluid" alt="{{ asta.titolo }}">
+    </div>
+    <div class="col-md-4">
+        <!-- Spiegazione: Mostriamo i vari campi dell'oggetto 'asta' che la DetailView ci ha passato -->
+        <h2>{{ asta.titolo }}</h2>
+        <p><strong>Venditore:</strong> {{ asta.venditore.username }}</p>
+        <p><strong>Categoria:</strong> {{ asta.categoria.nome }}</p>
+        <p>{{ asta.descrizione }}</p>
+        <hr>
+        
+        <!-- Mostriamo il prezzo corrente -->
+        {% if offerta_piu_alta %}
+            <h4>Prezzo attuale: € {{ offerta_piu_alta.importo }}</h4>
+            <p><small>Offerta fatta da: {{ offerta_piu_alta.acquirente.username }}</small></p>
+        {% else %}
+            <h4>Prezzo base: € {{ asta.prezzo_base }}</h4>
+            <p><small>Nessuna offerta ancora ricevuta.</small></p>
+        {% endif %}
+        
+        <p><strong>Rilancio minimo:</strong> € {{ asta.rilancio_minimo }}</p>
+        <p><strong>Scade il:</strong> {{ asta.data_fine|date:"d M Y, H:i" }}</p>
+        
+        <!-- Aggiungeremo il form per fare l'offerta qui nella Fase 5 -->
+        <div class="mt-3">
+            <p><em>Per fare un'offerta, devi essere registrato e loggato.</em></p>
+            <a href="#" class="btn btn-success btn-block disabled">Fai un'offerta</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

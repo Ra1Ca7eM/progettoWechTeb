@@ -1,0 +1,28 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Blocco per il titolo della pagina, che ogni pagina figlia potrà personalizzare -->
+    <title>{% block title %}Aste Online{% endblock %}</title>
+    <!-- Includiamo il CSS di Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <a class="navbar-brand" href="{% url 'aste:home' %}">Aste Online</a>
+    </nav>
+
+    <div class="container">
+        <!-- Questo è il blocco di contenuto principale che le pagine figlie riempiranno -->
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer class="text-center mt-4">
+        <p>Piattaforma Aste</p>
+    </footer>
+</body>
+</html>
