@@ -1,0 +1,56 @@
+<!-- aste/templates/aste/aggiungi_feedback.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lascia un Feedback per: {{ asta.titolo }}{% endblock %}
+
+{% block content %}
+    <h2>Lascia un Feedback per: "{{ asta.titolo }}"</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Valutazione:</label>
+            <!-- Usiamo la classe "rate" come nel tuo screenshot di riferimento -->
+            <div class="rate">
+                <input type="radio" id="star5" name="voto" value="5" required/><label for="star5" title="5 stelle">5 stars</label>
+                <input type="radio" id="star4" name="voto" value="4" /><label for="star4" title="4 stelle">4 stars</label>
+                <input type="radio" id="star3" name="voto" value="3" /><label for="star3" title="3 stelle">3 stars</label>
+                <input type="radio" id="star2" name="voto" value="2" /><label for="star2" title="2 stelle">2 stars</label>
+                <input type="radio" id="star1" name="voto" value="1" /><label for="star1" title="1 stella">1 star</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_commento">Commento:</label>
+            {{ form.commento }}
+        </div>
+        <button type="submit" class="btn btn-primary">Invia Feedback</button>
+    </form>
+{% endblock %}
+
+
+{% block script %}
+    <!-- Includiamo il nostro file CSS statico se non è già in base.html -->
+    <link rel="stylesheet" href="{% static 'aste/css/style.css' %}">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.rating-stars input[type=checkbox]');
+            const votoInput = document.querySelector('input[name="voto"]');
+
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = this.value;
+                    
+                    // Spunta tutte le checkbox fino a quella cliccata
+                    stars.forEach(s => {
+                        s.checked = (s.value <= rating);
+                    });
+
+                    // Aggiorna il valore del campo nascosto da inviare a Django
+                    votoInput.value = rating;
+                });
+            });
+        });
+    </script>
+{% endblock %}

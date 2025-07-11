@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Ricerca Aste{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Ricerca Avanzata</h2>
+        <!-- Il form punta a se stesso con metodo GET -->
+        <form method="get" action="{% url 'aste:ricerca' %}">
+            <div class="form-row align-items-end">
+                <div class="form-group col-md-4">
+                    {{ form.keyword.label_tag }}
+                    {{ form.keyword }}
+                </div>
+                <div class="form-group col-md-3">
+                    {{ form.categoria.label_tag }}
+                    {{ form.categoria }}
+                </div>
+                <div class="form-group col-md-3">
+                    {{ form.ordina_per.label_tag }}
+                    {{ form.ordina_per }}
+                </div>
+                <div class="form-group col-md-2">
+                    <div class="form-check">
+                        {{ form.includi_concluse }}
+                        {{ form.includi_concluse.label_tag }}
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Filtra / Ordina</button>
+        </form>
+
+        <hr>
+
+        <h3>Risultati Trovati</h3>
+        <div class="row">
+            {% for asta in aste_list %}
+                <!-- Riusiamo il nostro componente card! -->
+                {% include 'aste/_asta_card.html' %}
+            {% empty %}
+                <p class="col">La tua ricerca non ha prodotto risultati.</p>
+            {% endfor %}
+        </div>
+        
+        <!-- Aggiungiamo la paginazione -->
+        {% if is_paginated %}
+            <nav>
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number }}">Precedente</a></li>
+                    {% endif %}
+                    <li class="page-item disabled"><span class="page-link">Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}</span></li>
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}">Successiva</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+{% endblock %}

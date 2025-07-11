@@ -21,4 +21,11 @@ urlpatterns = [
     # URL per il login e logout (usando le viste predefinite di Django)
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='registration/logged_out.html'), name='logout'),
+    path('registrazione/completata/', RegistrazioneConfermaView.as_view(), name='registrazione_completata'),
+    path('profilo/', ProfiloView.as_view(), name='profilo'),
+    path('asta/nuova/', CreaAstaView.as_view(), name='crea_asta'),
+    path('asta/<int:pk>/offerta/', fai_offerta, name='fai_offerta'),
+    path('asta/<int:pk>/desideri/', gestisci_lista_desideri, name='gestisci_desideri'),
+    path('asta/<int:pk>/feedback/', aggiungi_feedback, name='aggiungi_feedback'),
+    path('ricerca/', RisultatiRicercaView.as_view(), name='ricerca'),
 ]

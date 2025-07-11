@@ -1,0 +1,10 @@
+<!-- templates/registration/registrazione_completata.html -->
+{% extends "base.html" %}
+
+{% block title %}Registrazione Completata{% endblock %}
+
+{% block content %}
+    <h2>Registrazione effettuata con successo!</h2>
+    <p>Il tuo account è stato creato. Ora puoi accedere alla piattaforma.</p>
+    <a href="{% url 'aste:login' %}" class="btn btn-primary">Vai al Login</a>
+{% endblock %}

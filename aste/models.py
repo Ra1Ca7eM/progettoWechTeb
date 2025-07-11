@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 # - `django.db.models`: Questo è il modulo che contiene la classe base `models.Model`
 #   e tutti i tipi di campo (CharField, IntegerField, etc.) che useremo.
@@ -47,6 +48,21 @@ class Categoria(models.Model):
 
     def __str__(self):
         return self.nome
+    
+class AstaManager(models.Manager):
+    def get_aste_vinte(self, user):
+        # Spiegazione: Questo metodo personalizzato trova tutte le aste vinte da un utente.
+        # 1. Filtra le aste il cui stato è 'conclusa'.
+        aste_concluse = self.filter(stato='conclusa')
+        
+        # 2. Trova gli ID delle aste dove l'offerta più alta appartiene all'utente.
+        aste_vinte_ids = [
+            asta.id for asta in aste_concluse 
+            if asta.offerte.first() and asta.offerte.first().acquirente == user
+        ]
+        
+        # 3. Restituisce il queryset finale.
+        return self.filter(pk__in=aste_vinte_ids)
 
 class Asta(models.Model):
     # Il cuore del nostro sistema.
@@ -86,11 +102,21 @@ class Asta(models.Model):
     # e un'asta può essere nei preferiti di molti utenti.
     # `blank=True` significa che questo campo non è obbligatorio.
     utenti_lista_desideri = models.ManyToManyField(User, related_name='lista_desideri', blank=True)
+    objects = AstaManager()
     class Meta:
         verbose_name_plural = "Aste"
 
     def __str__(self):
         return f"Asta: {self.titolo} | Venditore: {self.venditore.username}"
+    
+    def aggiorna_stato_se_scaduta(self):
+        # Spiegazione: Questo metodo controlla se l'asta è scaduta e non è già conclusa.
+        if self.stato == 'attiva' and self.data_fine < timezone.now():
+            self.stato = 'conclusa'
+            self.save() # Salva la modifica nel database
+            # Restituisce True se lo stato è cambiato, altrimenti False.
+            return True
+        return False
     
 class Offerta(models.Model):
     # Rappresenta un singolo rilancio su un'asta.
@@ -122,3 +148,6 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f"Feedback da {self.autore.username} a {self.destinatario.username} per '{self.asta.titolo}'"
+    
+    
+

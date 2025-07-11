@@ -9,11 +9,67 @@
     <title>{% block title %}Aste Online{% endblock %}</title>
     <!-- Includiamo il CSS di Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <link rel="stylesheet" href="{% static 'aste/css/style.css' %}">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <a class="navbar-brand" href="{% url 'aste:home' %}">Aste Online</a>
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'aste:home' %}">Aste Online</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <form class="form-inline mx-auto" method="get" action="{% url 'aste:ricerca' %}">
+                    <input class="form-control mr-sm-2" type="search" name="keyword" placeholder="Cerca un prodotto..." aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Cerca</button>
+                </form>
+                <ul class="navbar-nav ml-auto">
+                    <!-- Spiegazione: Qui inizia la logica condizionale.
+                        Il template ha accesso all'oggetto `user` della richiesta corrente.
+                        `user.is_authenticated` è un booleano che è True se l'utente ha fatto il login. -->
+                    {% if user.is_authenticated %}
+                        {% if user.profile.ruolo == 'venditore' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'aste:crea_asta' %}">Crea Asta</a>
+                        </li>
+                        {% endif %}
+                        <!-- Se l'utente È loggato, mostra questi link -->
+                        <li class="nav-item">
+                            <span class="nav-link text-light">Ciao, {{ user.username }}!</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'aste:profilo' %}">Pannello Personale</a>
+                        </li>
+                        <li class="nav-item">
+                            <form class="form-inline" method="post" action="{% url 'aste:logout' %}">
+                                {% csrf_token %} <!-- Il token CSRF è sempre obbligatorio per i form POST -->
+                                <!-- Usiamo un <button> che sembra un link per mantenere lo stile -->
+                                <button type="submit" class="btn btn-link nav-link">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <!-- Se l'utente NON è loggato, mostra questi altri link -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'aste:registrazione' %}">Registrati</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'aste:login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     </nav>
+
+    <div class="container">
+        <!-- Spiegazione: Controlliamo se nell'URL c'è il parametro 'logout' -->
+        {% if 'logout' in request.GET %}
+            <div class="alert alert-info">
+                Logout effettuato con successo. Arrivederci!
+            </div>
+        {% endif %}
+    </div>
 
     <div class="container">
         <!-- Questo è il blocco di contenuto principale che le pagine figlie riempiranno -->
@@ -24,5 +80,9 @@
     <footer class="text-center mt-4">
         <p>Piattaforma Aste</p>
     </footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{% static 'aste/js/main.js' %}"></script>
 </body>
 </html>

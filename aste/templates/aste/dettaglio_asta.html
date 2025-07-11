@@ -3,35 +3,106 @@
 {% block title %}{{ asta.titolo }}{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <img src="{{ asta.immagine.url }}" class="img-fluid" alt="{{ asta.titolo }}">
-    </div>
-    <div class="col-md-4">
-        <!-- Spiegazione: Mostriamo i vari campi dell'oggetto 'asta' che la DetailView ci ha passato -->
-        <h2>{{ asta.titolo }}</h2>
-        <p><strong>Venditore:</strong> {{ asta.venditore.username }}</p>
-        <p><strong>Categoria:</strong> {{ asta.categoria.nome }}</p>
-        <p>{{ asta.descrizione }}</p>
-        <hr>
-        
-        <!-- Mostriamo il prezzo corrente -->
-        {% if offerta_piu_alta %}
-            <h4>Prezzo attuale: € {{ offerta_piu_alta.importo }}</h4>
-            <p><small>Offerta fatta da: {{ offerta_piu_alta.acquirente.username }}</small></p>
-        {% else %}
-            <h4>Prezzo base: € {{ asta.prezzo_base }}</h4>
-            <p><small>Nessuna offerta ancora ricevuta.</small></p>
-        {% endif %}
-        
-        <p><strong>Rilancio minimo:</strong> € {{ asta.rilancio_minimo }}</p>
-        <p><strong>Scade il:</strong> {{ asta.data_fine|date:"d M Y, H:i" }}</p>
-        
-        <!-- Aggiungeremo il form per fare l'offerta qui nella Fase 5 -->
-        <div class="mt-3">
-            <p><em>Per fare un'offerta, devi essere registrato e loggato.</em></p>
-            <a href="#" class="btn btn-success btn-block disabled">Fai un'offerta</a>
+<div id="dettaglio-asta-container" data-asta-id="{{ asta.pk }}">
+    <div class="row">
+        <div class="col-md-8">
+            <img src="{{ asta.immagine.url }}" class="img-fluid" alt="{{ asta.titolo }}">
+        </div>
+        <div class="col-md-4">
+            <!-- Spiegazione: Mostriamo i vari campi dell'oggetto 'asta' che la DetailView ci ha passato -->
+            <h2>{{ asta.titolo }}</h2>
+            {% if user.is_authenticated and user.profile.ruolo == 'acquirente' %}
+                <button id="desideri-btn" class="btn btn-sm btn-outline-danger desideri-btn" data-asta-id="{{ asta.pk }}">
+                    {% if asta in user.lista_desideri.all %}
+                        ♥
+                    {% else %}
+                        ♡
+                    {% endif %}
+                </button>
+            {% endif %}
+            <p><strong>Venditore:</strong> {{ asta.venditore.username }}</p>
+            <p><strong>Categoria:</strong> {{ asta.categoria.nome }}</p>
+            <p>{{ asta.descrizione }}</p>
+            <hr>
+            
+            <!-- Mostriamo il prezzo corrente -->
+            {% if offerta_piu_alta %}
+                <h4 id="prezzo-attuale">Prezzo attuale: € {{ offerta_piu_alta.importo }}</h4>
+                <p id="acquirente-attuale"><small>Offerta fatta da: {{ offerta_piu_alta.acquirente.username }}</small></p>
+            {% else %}
+                <h4 id="prezzo-attuale">Prezzo base: € {{ asta.prezzo_base }}</h4>
+                <p id="acquirente-attuale"><small>Nessuna offerta ancora ricevuta.</small></p>
+            {% endif %}
+            
+            <p><strong>Rilancio minimo:</strong> € {{ asta.rilancio_minimo }}</p>
+            <h5 id="countdown" data-fine-asta="{{ asta.data_fine.isoformat }}"></h5>
+            {% if asta.stato != 'conclusa' %}
+                {% if user.is_authenticated and user.profile.ruolo == 'acquirente' %}
+                    <form id="offerta-form" class="mt-3" method="post" data-url="{% url 'aste:fai_offerta' asta.pk %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="importo-offerta">La tua offerta:</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">€</span>
+                                </div>
+                                <input type="number" class="form-control" id="importo-offerta" name="importo" 
+                                    step="0.01" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Fai un'offerta</button>
+                    </form>
+                    <div id="error-message" class="alert alert-danger mt-2" style="display: none;"></div>
+                {% elif user.is_authenticated %}
+                    <p class="mt-3"><em>Solo gli acquirenti possono fare offerte.</em></p>
+                {% else %}
+                    <p class="mt-3"><em><a href="{% url 'aste:login' %}">Accedi</a> per fare un'offerta.</em></p>
+                {% endif %}
+            {% else %}
+                    <p class="text-danger font-weight-bold">Asta Conclusa!</p>
+                    {% with vincitore=asta.offerte.first.acquirente %}
+                        {% if vincitore %}
+                            <p><small>Vinta da: {{ vincitore.username }}</small></p>
+                        {% else %}
+                            <p><small>Nessuna offerta ricevuta.</small></p>
+                        {% endif %}
+                    {% endwith %}
+            {% endif %}
+
+            {% with vincitore=asta.offerte.first.acquirente %}
+                {% if asta.stato == 'conclusa' and user == vincitore %}
+                    {% if not asta.feedback.all|length %}
+                        <a href="{% url 'aste:aggiungi_feedback' asta.pk %}" class="btn btn-info mt-3">Lascia un Feedback</a>
+                    {% endif %}
+                {% endif %}
+            {% endwith %}
         </div>
     </div>
 </div>
+
+<hr>
+<h3>Feedback per questa Asta</h3>
+{% for feedback in asta.feedback.all %}
+    <div class="card my-2">
+        <div class="card-body">
+            <p>"{{ feedback.commento }}"</p>
+            <footer class="blockquote-footer">
+                <strong>{{ feedback.autore.username }}</strong> 
+                <span class="text-warning">
+                    {% for i in "12345" %}
+                        {% if i|add:0 <= feedback.voto %}
+                            ★ <!-- Stella piena -->
+                        {% else %}
+                            ☆ <!-- Stella vuota -->
+                        {% endif %}
+                    {% endfor %}
+                </span>
+            </footer>
+        </div>
+    </div>
+{% empty %}
+    <p>Nessun feedback ancora ricevuto per questa asta.</p>
+{% endfor %}
+
+
 {% endblock %}

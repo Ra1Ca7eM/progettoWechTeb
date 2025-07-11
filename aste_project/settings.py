@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'aste',
+    
 ]
 
 MIDDLEWARE = [
@@ -69,6 +71,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'aste_project.wsgi.application'
+ASGI_APPLICATION = 'aste_project.asgi.application'
+
+# CHANNEL LAYERS CONFIGURATION
+# Spiegazione: Questa configurazione dice a Channels quale backend usare
+# per la comunicazione tra i componenti (es. tra una vista e un consumer).
+CHANNEL_LAYERS = {
+    "default": {
+        # Per lo sviluppo, il backend in-memory è perfetto.
+        # È leggero e non richiede servizi esterni come Redis.
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 
 # Database
@@ -106,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Rome'
 
 USE_I18N = True
 
@@ -127,6 +141,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Cartella separata per i file caricati dagli utenti
 # aste_project/settings.py
-LOGIN_REDIRECT_URL = '/'  # Dopo il login, vai alla homepage
-LOGOUT_REDIRECT_URL = '/' # Dopo il logout, vai alla homepage
-LOGIN_URL = 'login'       # Se un utente non è loggato, reindirizzalo all'URL con nome 'login'
+LOGIN_REDIRECT_URL = '/profilo/?login=success'  # Dopo il login, vai alla homepage
+LOGOUT_REDIRECT_URL = '/?logout=success' # Dopo il logout, vai alla homepage
+LOGIN_URL = 'aste:login'       # Se un utente non è loggato, reindirizzalo all'URL con nome 'login'
+
+
+
+

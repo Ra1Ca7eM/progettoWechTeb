@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Crea una Nuova Asta{% endblock %}
+
+{% block content %}
+<h2>Crea una Nuova Asta</h2>
+<form method="post" enctype="multipart/form-data">
+    <!-- Spiegazione: `enctype="multipart/form-data"` è OBBLIGATORIO
+         quando un form deve gestire il caricamento di file (come la nostra immagine). -->
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Pubblica Asta</button>
+</form>
+{% endblock %}

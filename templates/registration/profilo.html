@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Il Mio Profilo{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    <hr>
+    <!-- Qui mettiamo il tuo messaggio di benvenuto -->
+    {% if 'login' in request.GET %}
+        <div class="alert alert-success">
+            Login effettuato con successo! Bentornato, {{ user.username }}.
+        </div>
+    {% endif %}
+
+    
+    <ul>
+        <li><strong>Username:</strong> {{ user.username }}</li>
+        <li><strong>Email:</strong> {{ user.email }}</li>
+        <li><strong>Ruolo:</strong> {{ user.profile.get_ruolo_display }}</li>
+    </ul>
+
+    <!-- Spiegazione: Controlliamo il ruolo dell'utente per mostrare la sezione corretta. -->
+    {% if user.profile.ruolo == 'venditore' %}
+        
+        <h3>Le tue Aste Pubblicate</h3>
+        {% for asta in aste_create %}
+            <div class="card mb-2">
+                <div class="card-body">
+                    <a href="{% url 'aste:dettaglio_asta' asta.pk %}">{{ asta.titolo }}</a> - Stato: {{ asta.get_stato_display }}
+                </div>
+            </div>
+        {% empty %}
+            <p>Non hai ancora pubblicato nessuna asta.</p>
+        {% endfor %}
+
+    {% elif user.profile.ruolo == 'acquirente' %}
+
+        <h3>Le tue Aste Vinte</h3>
+        {% for asta in aste_vinte %}
+            <p><a href="{% url 'aste:dettaglio_asta' asta.pk %}">{{ asta.titolo }}</a></p>
+        {% empty %}
+            <p>Non hai ancora vinto nessuna asta.</p>
+        {% endfor %}
+        <hr>
+        
+        <h3>La tua Lista dei Desideri</h3>
+        {% for asta in lista_desideri %}
+            <p><a href="{% url 'aste:dettaglio_asta' asta.pk %}">{{ asta.titolo }}</a></p>
+        {% empty %}
+            <p>La tua lista dei desideri è vuota.</p>
+        {% endfor %}
+
+        <hr>
+
+        <h3>Le tue Offerte Recenti</h3>
+        {% for offerta in offerte_fatte %}
+            <p>Hai offerto €{{ offerta.importo }} per l'asta <a href="{% url 'aste:dettaglio_asta' offerta.asta.pk %}">{{ offerta.asta.titolo }}</a></p>
+        {% empty %}
+            <p>Non hai ancora fatto nessuna offerta.</p>
+        {% endfor %}
+
+    {% endif %}
+    <!-- In futuro qui aggiungeremo le liste di aste, offerte, etc. -->
+{% endblock %}

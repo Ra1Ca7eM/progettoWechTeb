@@ -1,0 +1,40 @@
+<div class="col-md-4">
+    <div class="card mb-4 shadow-sm">
+        <a href="{% url 'aste:dettaglio_asta' asta.pk %}">
+            <img src="{{ asta.immagine.url }}" class="card-img-top" alt="{{ asta.titolo }}">
+        </a>
+        <div class="card-body">
+            <h5 class="card-title">{{ asta.titolo }}</h5>
+            <p class="card-text">{{ asta.descrizione|truncatewords:15 }}</p>
+            <p class="card-text"><small class="text-muted">Scade il: {{ asta.data_fine|date:"d M Y, H:i" }}</small></p>
+
+            {% with offerta_top=asta.offerte.first %}
+                {% if offerta_top %}
+                    {% if user.is_authenticated and asta.pk in aste_vincenti_utente and asta in aste_list%}
+                        <p class="text-success font-weight-bold">Stai vincendo tu!</p>
+                    {% elif asta.stato != 'conclusa' %}
+                        <p><small>Offerta più alta: €{{ offerta_top.importo }}</small></p>
+                    {% else %}
+                        <p class="text-danger font-weight-bold">Asta Conclusa!</p>
+                        {% with vincitore=asta.offerte.first.acquirente %}
+                            {% if vincitore %}
+                                <p><small>Vinta da: {{ vincitore.username }}</small></p>
+                            {% else %}
+                                <p><small>Nessuna offerta ricevuta.</small></p>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'aste:dettaglio_asta' asta.pk %}" class="btn btn-primary">Vedi Dettagli</a>
+                {% if user.is_authenticated and user.profile.ruolo == 'acquirente' %}
+                    <button class="btn btn-sm btn-outline-danger desideri-btn" data-asta-id="{{ asta.pk }}">
+                        {% if asta in user.lista_desideri.all %}♥{% else %}♡{% endif %}
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
